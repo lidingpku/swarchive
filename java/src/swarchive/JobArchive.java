@@ -57,32 +57,6 @@ public class JobArchive {
 		//1. process ontology job
 		process_job(config.getFileJobOntology(),true);
 	}
-
-	/**
-	 * process automatically detected ontologies
-	 * 
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws Sw4jException
-	 */
-	public void run_ontology_todo() throws FileNotFoundException, IOException, Sw4jException{
-		//2. process ontology todo job
-		File f_ontology_todo = config.getFileJobOntologyTodo();
-
-		//append the todo file to log and delete the todo file
-		File f_ontology_todo_log = config.getFileLogOntologyTodo(new Date());
-		ToolIO.pipeFileToFile(f_ontology_todo, f_ontology_todo_log, true);
-		
-		//sort and unique lines in file
-		//String command = String.format("sort -u %s > %s", f_ontology_todo.getAbsolutePath(),f_ontology_todo.getAbsolutePath());
-		//Runtime.getRuntime().exec(command);
-		
-		//load all URLs and sort them
-		process_job(f_ontology_todo,true);
-		
-		f_ontology_todo.delete();
-		
-	}
 	
 	
 

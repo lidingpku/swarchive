@@ -132,10 +132,14 @@ public class JobDiscover {
 		
 		
 		//append observed ontologies to todo list of ontology
+		String content1 =String.format("# ontology found for URL %s in FILE %s\n", uu.url , f_cached.getAbsolutePath());
+		String content2 =ToolString.printCollectionToString(stat.listOntologies());
+
+		File f_ontology_todo_log = config.getFileLogOntologyTodo(new Date());
+		ToolIO.pipeStringToFile(content1+content2, f_ontology_todo_log, false, true);
+
 		File f_ontology_todo = config.getFileJobOntologyTodo();
-		String content=String.format("# ontology found for URL %s in FILE %s\n", uu.url , f_cached.getAbsolutePath());
-		content +=ToolString.printCollectionToString(stat.listOntologies());
-		ToolIO.pipeStringToFile(content, f_ontology_todo, false, true);
+		ToolIO.pipeStringToFile(content2, f_ontology_todo, false, true);
 	}
 	
 	public Logger getLogger(){
