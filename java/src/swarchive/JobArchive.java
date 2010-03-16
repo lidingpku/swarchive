@@ -11,6 +11,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import sw4j.rdf.load.AgentModelLoader;
+import sw4j.util.DataLRUCache;
 import sw4j.util.DataSmartMap;
 import sw4j.util.Sw4jException;
 import sw4j.util.Sw4jMessage;
@@ -18,20 +19,20 @@ import sw4j.util.ToolHash;
 import sw4j.util.ToolIO;
 
 public class JobArchive {
+	private DataConfig config = null;
 	
 	public static void main(String[] args){
 		
 		try {
 			
-			JobArchive agent = new JobArchive();
-			
+			DataConfig config = new DataConfig();
 			//load config
 			if (args.length>0)
-				agent.config = DataConfig.create(args[0]);
+				config = DataConfig.load(args[0]);
 			
-			//process job
-			agent.process_job(agent.config.getFileJobOntology(),true);
-
+			JobArchive agent = new JobArchive(config);
+			agent.run_ontology();
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -40,46 +41,112 @@ public class JobArchive {
 			e.printStackTrace();
 		} 		
 	}
-
-	DataConfig config = DataConfig.create();
 	
+	public JobArchive(DataConfig config){
+		this.config = config;
+	}
+	
+	
+	/**
+	 * process user defined ontology seeds
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public void run_ontology() throws FileNotFoundException, IOException{
+		//1. process ontology job
+		process_job(config.getFileJobOntology(),true);
+	}
+
+	/**
+	 * process automatically detected ontologies
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws Sw4jException
+	 */
+	public void run_ontology_todo() throws FileNotFoundException, IOException, Sw4jException{
+		//2. process ontology todo job
+		File f_ontology_todo = config.getFileJobOntologyTodo();
+
+		//append the todo file to log and delete the todo file
+		File f_ontology_todo_log = config.getFileLogOntologyTodo(new Date());
+		ToolIO.pipeFileToFile(f_ontology_todo, f_ontology_todo_log, true);
+		
+		//sort and unique lines in file
+		//String command = String.format("sort -u %s > %s", f_ontology_todo.getAbsolutePath(),f_ontology_todo.getAbsolutePath());
+		//Runtime.getRuntime().exec(command);
+		
+		//load all URLs and sort them
+		process_job(f_ontology_todo,true);
+		
+		f_ontology_todo.delete();
+		
+	}
+	
+	
+
+	/**
+	 * process a job file, each line corresponding to a crawl
+	 * 
+	 * @param f_jobfile		- the file containing job description
+	 * @param requireRDF	- if the target document must be an valid RDF document
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public void process_job(File f_jobfile, boolean requireRDF) throws FileNotFoundException, IOException{
-		System.out.println("loading ... "+ f_jobfile.getAbsolutePath());
+		System.out.println("processing ... "+ f_jobfile.getAbsolutePath());
 		BufferedReader reader = new BufferedReader(new FileReader(f_jobfile));
+		
+		DataLRUCache<String> visited = new DataLRUCache<String>(1000);
+		
 		String line=null;
 		while (null!=(line=reader.readLine())){
-			DataJobArchive job = DataJobArchive.create(line);
-			
-			if (null==job)
+			DataJobArchive job = new DataJobArchive();
+
+			//parse job description
+			if (!job.initFromCsv(line))
 				continue;
 			
-			//now process the job
+			//avoid duplicated job
+			if (visited.contains(line))
+				continue;
+			visited.add(line);
 			
+			//now process the job
 			archive(job.getAsString(DataJobArchive.JOB_URI), requireRDF);
+			
+			
 		}
 
 	}
 	
+	/**
+	 * archive a single URL
+	 * 
+	 * @param szUri
+	 * @param requireRDF
+	 */
 	
 	public void archive(String szUri, boolean requireRDF){
-		Date date = new Date();
 
 		DataSmartMap log = new DataSmartMap();
-		log.put("uri", szUri);
-		log.put("requireRDF", requireRDF);
-		log.put("url", "");
+		log.put(DataJob.JOB_URI, szUri);
+		log.put(DataJob.JOB_REQUIRERDF, requireRDF);
+		log.put(DataJob.JOB_URL, "");
 //		log.put("filename", "");
-		log.put("cnt_length", "");
-		log.put("timestamp", System.currentTimeMillis());
-		log.put("modified", "");
-		log.put("sha1sum", "");
-		log.put("cnt_triples", 0);
-		log.put("duplicated", false);
+		log.put(DataJob.JOB_CNT_LENGTH, "");
+		log.put(DataJob.JOB_TS_JOB, System.currentTimeMillis());
+		log.put(DataJob.JOB_TS_MODIFIED, "");
+		log.put(DataJob.JOB_TS_HISTORY, "");
+		log.put(DataJob.JOB_SHA1SUM, "");
+		log.put(DataJob.JOB_CNT_TRIPLE, 0);
+		log.put(DataJob.JOB_DUPLICATED, false);
 		//process URL
 		try {
-			DataUriUrl uu = DataUriUrl.create(szUri, this.config);
+			DataUriUrl uu = DataUriUrl.create(szUri);
 
-			log.put("url", uu.url);
+			log.put(DataJob.JOB_URL, uu.url);
 //			log.put("filename", uu.filename_url);
 
 			//download file
@@ -91,13 +158,13 @@ public class JobArchive {
 
 			//check duplication
 			String content = loader.getLoad().getContent();
-			log.put("cnt_length", content.length());
-			log.put("sha1sum", ToolHash.hash_mbox_sum_sha1(content));
+			log.put(DataJob.JOB_CNT_LENGTH, content.length());
+			log.put(DataJob.JOB_SHA1SUM, ToolHash.hash_mbox_sum_sha1(content));
 
-			File file_current = uu.getFileCurrent();
+			File file_current = config.getFileCurrent(uu);
 			if (file_current.exists()){
 				if (file_current.length()==content.getBytes("UTF-8").length){
-					log.put("duplicated", true);
+					log.put(DataJob.JOB_DUPLICATED, true);
 					throw new Sw4jException(Sw4jMessage.STATE_INFO, "duplicate content (by file length)." );
 				}
 			}
@@ -107,19 +174,24 @@ public class JobArchive {
 				if (null== loader.getModelData()){
 					throw new Sw4jException(Sw4jMessage.STATE_INFO, "need RDF." );
 				}					
-				log.put("cnt_triples", loader.getModelData().size());
+				log.put(DataJob.JOB_CNT_TRIPLE, loader.getModelData().size());
 			}
 			
+			log.put(DataJob.JOB_TS_MODIFIED, loader.getLoad().getLastmodified());
+
 			//save file to appropriate folder
+			
+			//save history
+			Date date = new Date();
 			if (loader.getLoad().getLastmodified()>0)
 				date = new Date(loader.getLoad().getLastmodified());
-			
-			log.put("modified", loader.getLoad().getLastmodified());
+			log.put(DataJob.JOB_TS_HISTORY, date.getTime());
 
-			File file_history = uu.getFileHistory(date);
-
-			ToolIO.pipeStringToFile(loader.getLoad().getContent(), file_current);
+			File file_history = config.getFileHistory(uu,date);
 			ToolIO.pipeStringToFile(loader.getLoad().getContent(), file_history);
+
+			//save current
+			ToolIO.pipeStringToFile(loader.getLoad().getContent(), file_current);
 			
 			
 		} catch (Sw4jException e) {
@@ -130,7 +202,7 @@ public class JobArchive {
 		
 		//generate log
 		try {
-			File file_log = this.config.getFileLog();
+			File file_log = this.config.getFileLog(null);
 			if (!file_log.exists()){
 				ToolIO.pipeStringToFile(log.toCSVheader()+"\n",file_log);
 			}
