@@ -13,6 +13,7 @@ import sw4j.rdf.load.AgentModelLoader;
 import sw4j.rdf.util.AgentModelStat;
 import sw4j.util.Sw4jException;
 import sw4j.util.ToolIO;
+import sw4j.util.ToolSafe;
 import sw4j.util.ToolString;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -96,7 +97,11 @@ public class JobDiscover {
 			
 			//now process the job
 			try {
-				process_one_url(job.getAsString(DataJob.JOB_URL), new Date(Long.parseLong(job.getAsString(DataJob.JOB_TS_HISTORY))));
+				String historytime =job.getAsString(DataJob.JOB_TS_HISTORY); 
+				if (!ToolSafe.isEmpty(historytime))
+						process_one_url(job.getAsString(DataJob.JOB_URL), new Date(Long.parseLong(historytime)));
+				else
+					getLogger().info("bad lines in job description (ts_history): " + job.toString());
 			} catch (NumberFormatException e) {
 				getLogger().warn(e.getMessage());
 			} catch (Sw4jException e) {
