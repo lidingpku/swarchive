@@ -1,0 +1,22 @@
+==naming convention==
+1. trim <URI> to <URL>
+we focus on <URL> instead of <URI>. To convert from <URI> to <URL>, remove anything (inclusive) after "#"
+
+2. generate hash (sha1sum) for <URL>
+<HASH-URL> ::= sha1sum(<URL>)
+
+3. normalize <URL>
+<NORM-URL> ::= url_encode (<URL>)
+
+4. compute file path
+<REL-FILE-PATH> ::= first-two-chars(<HASH-URL>)
+<DATE-FILE-PATH> ::= sprintf("yyyy/mm/dd", modification-date-of (<URL>))
+
+5. save data
+<FILE-CURRENT>     ::=  data/current/<REL-FILE-PATH>/<NORM-URL>
+<FILE-HISTORY>     ::=  data/history/<REL-FILE-PATH>/<NORM-URL>/<DATE-FILE-PATH>/<NORM-URL>
+<FILE-LOG>         ::=  data/log/<YYYY>/<DATE-FILE-PATH>-log.csv
+
+6. seed 
+<FILE-CONFIG>         ::= seed/swarchive.conf
+<FILE-JOB-ONTOLOGY>   ::= seed/job-ontology.csv 
