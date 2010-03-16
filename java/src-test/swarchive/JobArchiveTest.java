@@ -3,7 +3,7 @@ package swarchive;
 import org.junit.Test;
 
 
-public class JobSwArchiveTest {
+public class JobArchiveTest {
 	
 	@Test
 	public void test_load(){
@@ -13,7 +13,7 @@ public class JobSwArchiveTest {
 			"http://xmlns.com/foaf/0.1/",
 		};
 
-		JobSwArchive swa = new JobSwArchive();
+		JobArchive swa = new JobArchive();
 		for (int i=0; i< address.length; i++){
 			String szUrl  = address[i];
 			swa.archive(szUrl, false);
