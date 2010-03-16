@@ -118,7 +118,7 @@ public class JobDiscover {
 		
 		//append observed ontologies to todo list of ontology
 		File f_ontology_todo = config.getFileJobOntologyTodo();
-		String content=String.format("# ontology found for URL %s in FILE %s\n ", uu.url , f_cached.getAbsolutePath());
+		String content=String.format("# ontology found for URL %s in FILE %s\n", uu.url , f_cached.getAbsolutePath());
 		content +=ToolString.printCollectionToString(stat.listOntologies());
 		ToolIO.pipeStringToFile(content, f_ontology_todo, false, true);
 	}
