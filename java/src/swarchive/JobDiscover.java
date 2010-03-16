@@ -32,16 +32,10 @@ public class JobDiscover {
 			JobDiscover disc = new JobDiscover(config);
 			disc.run();
 			
-			JobArchive archive= new JobArchive(config);
-			archive.run_ontology_todo();
-
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Sw4jException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 		
