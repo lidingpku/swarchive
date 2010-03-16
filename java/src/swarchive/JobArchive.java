@@ -17,13 +17,13 @@ import sw4j.util.Sw4jMessage;
 import sw4j.util.ToolHash;
 import sw4j.util.ToolIO;
 
-public class JobSwArchive {
+public class JobArchive {
 	
 	public static void main(String[] args){
 		
 		try {
 			
-			JobSwArchive agent = new JobSwArchive();
+			JobArchive agent = new JobArchive();
 			
 			//load config
 			if (args.length>0)
