@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="swarchive" default="archive" basedir=".">
+<project name="swarchive" default="discover" basedir=".">
 	<property name="class.dir" value="classes" />
 	<property name="src.dir" value="src" />
 	<property name="lib.dir" value="lib" />
@@ -30,11 +30,19 @@
 	</target>
 	
 	<target name="archive" depends="compile">
-		<java classname="swarchive.JobSwArchive">
+		<java classname="swarchive.JobArchive">
  	        <classpath refid="path.run"/>
-			<arg value="../data/seed/swarchive.conf"/>
+			<arg value="swarchive.conf"/>
 		</java>
 	</target>
+	
+	<target name="discover" depends="compile">
+		<java classname="swarchive.JobDiscover">
+ 	        <classpath refid="path.run"/>
+			<arg value="swarchive.conf"/>
+		</java>
+	</target>
+
 	<target name="clean">
 		<delete dir="${class.dir}" />
 	</target>

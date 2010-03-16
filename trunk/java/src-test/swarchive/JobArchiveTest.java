@@ -13,7 +13,7 @@ public class JobArchiveTest {
 			"http://xmlns.com/foaf/0.1/",
 		};
 
-		JobArchive swa = new JobArchive();
+		JobArchive swa = new JobArchive(new DataConfig());
 		for (int i=0; i< address.length; i++){
 			String szUrl  = address[i];
 			swa.archive(szUrl, false);
