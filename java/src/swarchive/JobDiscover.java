@@ -53,16 +53,37 @@ public class JobDiscover {
 	
 	
 	private void run() throws IOException {
-		//get starting date
-		Date date = config.getDiscDate();
+		//process today
+		try{
+			//get today
+			Date date = new Date();
+	
+			//process today's log
+			File f_log = config.getFileLog(date);
+			process_one_log(f_log);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		//process today's log
-		File f_log = config.getFileLog(date);
-		process_one_log(f_log);
-		
-		//update config, move to the next date
-		config.setDiscDate(DataConfig.incrementDate(date));
-		config.store();
+		//process any day before today
+		try{
+			//get starting date
+			Date date = config.getDiscDate();
+			if (date.compareTo(new Date())<0){
+				//process today's log
+				File f_log = config.getFileLog(date);
+				process_one_log(f_log);
+				
+				//update config, move to the next date
+				config.setDiscDate(DataConfig.incrementDate(date));
+				config.store();				
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void process_one_log(File f_log) throws IOException {
