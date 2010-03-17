@@ -123,6 +123,7 @@ public class JobArchive {
 		//process URL
 		try {
 			DataUriUrl uu = DataUriUrl.create(szUri);
+			File file_current = config.getFileCurrent(uu);
 
 			log.put(DataJob.JOB_URL, uu.url);
 //			log.put("filename", uu.filename_url);
@@ -131,6 +132,14 @@ public class JobArchive {
 			if (skip.testSkip(uu.url))
 				throw new Sw4jException(Sw4jMessage.STATE_INFO, "skip url: " + uu.url);
 
+			
+			//check if we only handle new URL
+			if (config.checkNewUrlOnly()){
+				if (file_current.exists()){
+					throw new Sw4jException(Sw4jMessage.STATE_INFO, "skip existing url: " + uu.url);
+				}
+			}
+				
 			//download file
 			AgentModelLoader loader= new AgentModelLoader(uu.url);
 
@@ -151,7 +160,6 @@ public class JobArchive {
 			log.put(DataJob.JOB_CNT_LENGTH, content.length());
 			log.put(DataJob.JOB_SHA1SUM, ToolHash.hash_mbox_sum_sha1(content));
 
-			File file_current = config.getFileCurrent(uu);
 			if (file_current.exists()){
 				if (file_current.length()==content.getBytes("UTF-8").length){
 					log.put(DataJob.JOB_DUPLICATED, true);

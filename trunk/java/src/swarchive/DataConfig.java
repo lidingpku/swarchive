@@ -37,6 +37,7 @@ public class DataConfig extends Properties{
 	public static final String CONFIG_JOB_ONTOLOGY_TODO = "job_ontology_todo";
 	public static final String CONFIG_JOB_DISC_DATE = "job_disc_date";
 	public static final String CONFIG_FILE_SKIP_PATTERN= "file_skip_pattern";
+	public static final String CONFIG_NEW_URL_ONLY= "new_url_only";
 	
 	public File f_conf = new File(G_FILENAME_DEFAULT);
 
@@ -224,5 +225,9 @@ public class DataConfig extends Properties{
 	
 	public Logger getLogger(){
 		return Logger.getLogger(this.getClass());
+	}
+	
+	public boolean checkNewUrlOnly(){
+		return this.containsKey(CONFIG_NEW_URL_ONLY);
 	}
 }
