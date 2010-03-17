@@ -149,7 +149,7 @@ public class JobArchive {
 				//if the site is not accessible, skip it
 				if (loader.getLoad().getState()==TaskLoad.STATE_OUTPUT_FAILED_CONNECTION_CANNOT_OPEN){
 					String host_url = uu.getHostUrl();
-					if (ToolSafe.isEmpty(host_url))
+					if (!ToolSafe.isEmpty(host_url))
 						skip.add(String.format("%s.+",host_url.replace(".", "\\.")), true);
 				}
 				
