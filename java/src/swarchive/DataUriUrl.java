@@ -1,12 +1,12 @@
 package swarchive;
 
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 
 import sw4j.util.DataQname;
 import sw4j.util.Sw4jException;
 import sw4j.util.ToolHash;
+import sw4j.util.ToolSafe;
 import sw4j.util.ToolURI;
 
 public class DataUriUrl {
@@ -33,15 +33,15 @@ public class DataUriUrl {
 		return data;
 	}
 	
-	public String getHostName(){
-		URL u;
+	public String getHostUrl(){
 		try {
-			u = new URL (url);
-			return u.getHost();
-		} catch (MalformedURLException e) {
+			URI ret = ToolURI.extractHostUrl(ToolURI.string2uri(url));
+			if (null!=ret && !ToolSafe.isEmpty(ret.getHost()))
+				return ret.toString();
+		} catch (Sw4jException e) {
 			e.printStackTrace();
-			return null;
 		}
+		return null;
 	}
 
 
