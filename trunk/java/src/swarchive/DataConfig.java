@@ -183,7 +183,7 @@ public class DataConfig extends Properties{
 		paths.add(G_HISTORY);
 		paths.add(uu.rel_path_url);
 		paths.add(uu.norm_url);
-		paths.add(formatDate(date, "yyyy-MM-dd") );
+		paths.add(formatDate(date, "yyyy-MM-dd-hh-mm-ss") );
 		String filename = formatFileLocation(paths, uu.norm_url);
 		return new File(filename);
 	}
