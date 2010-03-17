@@ -11,6 +11,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import sw4j.rdf.load.AgentModelLoader;
+import sw4j.rdf.util.ToolJena;
 import sw4j.util.DataLRUCache;
 import sw4j.util.DataSmartMap;
 import sw4j.util.Sw4jException;
@@ -161,12 +162,13 @@ public class JobArchive {
 				date = new Date(loader.getLoad().getLastmodified());
 			log.put(DataJob.JOB_TS_HISTORY, date.getTime());
 
-			File file_history = config.getFileHistory(uu,date);
-			ToolIO.pipeStringToFile(loader.getLoad().getContent(), file_history);
+			ToolIO.pipeStringToFile(loader.getLoad().getContent(), config.getFileHistory(uu,date));
 
 			//save current
 			ToolIO.pipeStringToFile(loader.getLoad().getContent(), file_current);
 			
+			//save current to RDF
+			ToolJena.printModelToFile(loader.getModelData(), config.getFileCurrentRdf(uu));
 			
 		} catch (Sw4jException e) {
 			getLogger().info("error: "+ e.getMessage());

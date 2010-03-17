@@ -176,7 +176,15 @@ public class DataConfig extends Properties{
 		String filename = formatFileLocation(paths, uu.norm_url);
 		return new File(filename);
 	}
-	
+
+	public File getFileCurrentRdf(DataUriUrl uu){
+		List<String> paths = createPathsData();
+		paths.add(G_CURRENT);
+		paths.add(uu.rel_path_url);
+		String filename = formatFileLocation(paths, uu.norm_url+".rdf");
+		return new File(filename);
+	}
+
 	
 	public File getFileHistory(DataUriUrl uu, Date date){
 		List<String> paths = createPathsData();
