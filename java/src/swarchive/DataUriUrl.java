@@ -21,8 +21,10 @@ public class DataUriUrl {
 
 	public static DataUriUrl create(String szUri) throws Sw4jException{
 		DataUriUrl data = new DataUriUrl();
-		data.url= szUri;
+		data.uri= szUri;
 		data.url = DataQname.extractNamespaceUrl(szUri);
+		if (null==data.url)
+			data.url=data.uri;
 //		data.filename_url = filenameUrl(data.url);
 		data.hash_url = hashUrl(data.url);
 		data.norm_url = normUrl(data.url);
