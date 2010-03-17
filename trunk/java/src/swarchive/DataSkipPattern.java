@@ -42,6 +42,7 @@ public class DataSkipPattern {
 	}
 	
 	public void add(String pattern, boolean bSave){
+		
 		patterns.add(pattern);
 
 		if (bSave){

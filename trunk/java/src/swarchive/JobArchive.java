@@ -19,6 +19,7 @@ import sw4j.util.Sw4jException;
 import sw4j.util.Sw4jMessage;
 import sw4j.util.ToolHash;
 import sw4j.util.ToolIO;
+import sw4j.util.ToolSafe;
 
 public class JobArchive {
 	private DataConfig config = null;
@@ -147,9 +148,9 @@ public class JobArchive {
 				
 				//if the site is not accessible, skip it
 				if (loader.getLoad().getState()==TaskLoad.STATE_OUTPUT_FAILED_CONNECTION_CANNOT_OPEN){
-					String host_url = uu.getHostName();
-					if (null!=host_url)
-						skip.add(String.format(".+%s.+",host_url.replace(".", "\\.")), true);
+					String host_url = uu.getHostUrl();
+					if (ToolSafe.isEmpty(host_url))
+						skip.add(String.format("%s.+",host_url.replace(".", "\\.")), true);
 				}
 				
 				throw new Sw4jException(Sw4jMessage.STATE_INFO, "load failed: " + loader.getLoad().getReport().toCSVrow());
