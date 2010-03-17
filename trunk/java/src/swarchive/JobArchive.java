@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import sw4j.rdf.load.AgentModelLoader;
 import sw4j.rdf.util.ToolJena;
+import sw4j.task.load.TaskLoad;
 import sw4j.util.DataLRUCache;
 import sw4j.util.DataSmartMap;
 import sw4j.util.Sw4jException;
@@ -21,6 +22,7 @@ import sw4j.util.ToolIO;
 
 public class JobArchive {
 	private DataConfig config = null;
+	private DataSkipPattern skip = null;
 	
 	public static void main(String[] args){
 		
@@ -45,6 +47,7 @@ public class JobArchive {
 	
 	public JobArchive(DataConfig config){
 		this.config = config;
+		this.skip = DataSkipPattern.create(config);
 	}
 	
 	
@@ -124,10 +127,22 @@ public class JobArchive {
 			log.put(DataJob.JOB_URL, uu.url);
 //			log.put("filename", uu.filename_url);
 
+			//check skip pattern file
+			if (skip.testSkip(uu.url))
+				throw new Sw4jException(Sw4jMessage.STATE_INFO, "skip url: " + uu.url);
+
 			//download file
 			AgentModelLoader loader= new AgentModelLoader(uu.url);
 
 			if (!loader.getLoad().isLoadSucceed()){
+				
+				//if the site is not accessible, skip it
+				if (loader.getLoad().getState()==TaskLoad.STATE_OUTPUT_FAILED_CONNECTION_CANNOT_OPEN){
+					String host_url = uu.getHostName();
+					if (null!=host_url)
+						skip.add(String.format(".+%s.+",host_url.replace(".", "\\.")), true);
+				}
+				
 				throw new Sw4jException(Sw4jMessage.STATE_INFO, "load failed: " + loader.getLoad().getReport().toCSVrow());
 			}
 

@@ -36,6 +36,7 @@ public class DataConfig extends Properties{
 	public static final String CONFIG_JOB_ONTOLOGY = "job_ontology";
 	public static final String CONFIG_JOB_ONTOLOGY_TODO = "job_ontology_todo";
 	public static final String CONFIG_JOB_DISC_DATE = "job_disc_date";
+	public static final String CONFIG_FILE_SKIP_PATTERN= "file_skip_pattern";
 	
 	public File f_conf = new File(G_FILENAME_DEFAULT);
 
@@ -43,6 +44,7 @@ public class DataConfig extends Properties{
 		put(CONFIG_DIR_HOME, G_DIR_HOME_DEFAULT);
 		put(CONFIG_JOB_ONTOLOGY, "job_ontology.csv");
 		put(CONFIG_JOB_ONTOLOGY_TODO, "job_ontology_todo.csv");
+		put(CONFIG_FILE_SKIP_PATTERN, "skip_pattern.txt");
 		put(CONFIG_JOB_DISC_DATE, formatDate(null, "yyyy-MM-dd"));
 	}
 
@@ -154,7 +156,17 @@ public class DataConfig extends Properties{
 		String filename = formatFileLocation(paths, this.getProperty(CONFIG_JOB_ONTOLOGY_TODO));
 		return new File(filename);
 	}
-	
+
+	public File getFileSkipPattern(){
+		if (ToolSafe.isEmpty( this.getProperty(CONFIG_FILE_SKIP_PATTERN)))
+			return null;
+		
+		List<String> paths = createPathsData();
+		paths.add(G_SEED);
+		String filename = formatFileLocation(paths, this.getProperty(CONFIG_FILE_SKIP_PATTERN));
+		return new File(filename);
+	}
+
 	public  File getFileLog(Date date){
 		List<String> paths = createPathsData();
 		paths.add(G_LOG);

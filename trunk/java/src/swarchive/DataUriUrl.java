@@ -1,6 +1,9 @@
 package swarchive;
 
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import sw4j.util.DataQname;
 import sw4j.util.Sw4jException;
 import sw4j.util.ToolHash;
@@ -26,6 +29,17 @@ public class DataUriUrl {
 		data.rel_path_url = data.hash_url.substring(0,2);
 				
 		return data;
+	}
+	
+	public String getHostName(){
+		URL u;
+		try {
+			u = new URL (url);
+			return u.getHost();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 
