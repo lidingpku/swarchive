@@ -4985,6 +4985,7 @@ http://purl.org/nbirn/birnlex/ontology/annotation/BIRNLex_annotation_properties.
 http://purl.org/nbirn/birnlex/ontology/annotation/OBO_annotation_properties.owl
 http://purl.org/nbirn/birnlex/ontology/annotation/OBO_annotation_properties.owl#
 http://purl.org/nbirn/birnlex/ontology/obo-foundry/core/obo-foundry-core-full-import.owl
+http://purl.org/nbirn/birnlex/ontology/obo-foundry/core/obo-foundry-core.owl
 http://purl.org/net/inkel/rdf/schemas/lang/1.1#
 http://purl.org/net/provenance/integrity#
 http://purl.org/net/provenance/ns#
@@ -5596,6 +5597,7 @@ http://www.nbirn.net/birnlex/1.0/BIRNLex_annotation_properties.owl
 http://www.nbirn.net/birnlex/1.0/BIRNLex_annotation_properties.owl#
 http://www.nbirn.net/birnlex/1.0/OBO_annotation_properties.owl#
 http://www.nervouscreation.com/documents/ontologies/BrainFrame.rdf-xml.owl#
+http://www.obofoundry.org/ro/ro.owl
 http://www.obofoundry.org/ro/ro.owl#
 http://www.ontoknowledge.org/oil/rdf-schema/2000/11/10-oil-standard#
 http://www.ontologydesignpatterns.org/cp/owl/agentrole.owl
