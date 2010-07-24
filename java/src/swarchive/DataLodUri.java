@@ -9,7 +9,7 @@ import sw4j.util.ToolHash;
 import sw4j.util.ToolSafe;
 import sw4j.util.ToolURI;
 
-public class DataUriUrl {
+public class DataLodUri {
 	
 	
 	String uri ;
@@ -19,8 +19,8 @@ public class DataUriUrl {
 	String norm_url ;
 	String rel_path_url; 
 
-	public static DataUriUrl create(String szUri) throws Sw4jException{
-		DataUriUrl data = new DataUriUrl();
+	public static DataLodUri create(String szUri) throws Sw4jException{
+		DataLodUri data = new DataLodUri();
 		data.uri= szUri;
 		data.url = DataQname.extractNamespaceUrl(szUri);
 		if (null==data.url)

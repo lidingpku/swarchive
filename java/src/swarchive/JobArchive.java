@@ -121,26 +121,48 @@ public class JobArchive {
 		log.put(DataJob.JOB_SHA1SUM, "");
 		log.put(DataJob.JOB_CNT_TRIPLE, 0);
 		log.put(DataJob.JOB_DUPLICATED, false);
-		//process URL
-		try {
-			DataUriUrl uu = DataUriUrl.create(szUri);
-			File file_current = config.getFileCurrent(uu);
+		
+		//pre-process: validate/parse URI
+		DataLodUri uu = null;
+		File file_current =null;
+		try{
+			uu = DataLodUri.create(szUri);
 
+			//record cleared URL
 			log.put(DataJob.JOB_URL, uu.url);
 //			log.put("filename", uu.filename_url);
 
-			//check skip pattern file
+			file_current = config.getFileCurrent(uu);
+			
+		} catch (Sw4jException e) {
+			getLogger().info("error: "+ e.getMessage());
+			ToolMyUtil.writeCsv(this.config.getFileLogLog(null), log);
+			return;
+		}
+		
+		//pre-process: skip based on configuration
+		try{			
+
+			//1. check skip pattern file
 			if (skip.testSkip(uu.url))
 				throw new Sw4jException(Sw4jMessage.STATE_INFO, "skip url: " + uu.url);
 
-			
-			//check if we only handle new URL
+			//2. check if we only handle new URL
 			if (config.checkNewUrlOnly()){
 				if (file_current.exists()){
 					throw new Sw4jException(Sw4jMessage.STATE_INFO, "skip existing url: " + uu.url);
 				}
 			}
-				
+		} catch (Sw4jException e) {
+			getLogger().info("error: "+ e.getMessage());
+			ToolMyUtil.writeCsv(this.config.getFileLogLog(null), log);
+			return;
+		}
+
+		
+		boolean bChanged =false;
+		//process URL
+		try {
 			//download file
 			AgentModelLoader loader= new AgentModelLoader(uu.url);
 
@@ -156,17 +178,21 @@ public class JobArchive {
 				throw new Sw4jException(Sw4jMessage.STATE_INFO, "load failed: " + loader.getLoad().getReport().toCSVrow());
 			}
 
-			//check duplication
+			//check for change
 			String content = loader.getLoad().getContent();
 			log.put(DataJob.JOB_CNT_LENGTH, content.length());
 			log.put(DataJob.JOB_SHA1SUM, ToolHash.hash_mbox_sum_sha1(content));
 
 			if (file_current.exists()){
-				if (file_current.length()==content.getBytes("UTF-8").length){
+				bChanged |= (file_current.length()==content.getBytes("UTF-8").length);
+				
+				if (bChanged){
 					log.put(DataJob.JOB_DUPLICATED, true);
 					throw new Sw4jException(Sw4jMessage.STATE_INFO, "duplicate content (by file length)." );
 				}
 			}
+			
+			//continue process if the file has been changed
 			
 			//check RDF
 			if (requireRDF){
@@ -175,19 +201,24 @@ public class JobArchive {
 				}					
 				log.put(DataJob.JOB_CNT_TRIPLE, loader.getModelData().size());
 			}
-			
+
+			//record modification timestamp
 			log.put(DataJob.JOB_TS_MODIFIED, loader.getLoad().getLastmodified());
 
 			//save file to appropriate folder
 			
-			//save history
+			// get history date
 			Date date = new Date();
 			if (loader.getLoad().getLastmodified()>0)
 				date = new Date(loader.getLoad().getLastmodified());
 			log.put(DataJob.JOB_TS_HISTORY, date.getTime());
 
+			// save history
 			ToolIO.pipeStringToFile(loader.getLoad().getContent(), config.getFileHistory(uu,date));
 
+			// update history log
+			ToolMyUtil.writeCsv(this.config.getFileHistoryLog(uu, date), log);
+			
 			//save current
 			ToolIO.pipeStringToFile(loader.getLoad().getContent(), file_current);
 			
@@ -201,16 +232,8 @@ public class JobArchive {
 		}
 		
 		//generate log
-		try {
-			File file_log = this.config.getFileLog(null);
-			if (!file_log.exists()){
-				ToolIO.pipeStringToFile(log.toCSVheader()+"\n",file_log);
-			}
+		ToolMyUtil.writeCsv(this.config.getFileLogLog(null), log);
 
-			ToolIO.pipeStringToFile(log.toCSVrow()+"\n",file_log,false,true);
-		} catch (Sw4jException e) {
-			getLogger().info("error: "+ e.getMessage());
-		}
 	}
 	
 	public Logger getLogger(){
