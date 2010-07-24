@@ -54,7 +54,7 @@ public class JobDiscover {
 			Date date = new Date();
 	
 			//process today's log
-			File f_log = config.getFileLog(date);
+			File f_log = config.getFileLogLog(date);
 			process_one_log(f_log);
 			
 		} catch (IOException e) {
@@ -68,7 +68,7 @@ public class JobDiscover {
 			Date date = config.getDiscDate();
 			if (date.compareTo(new Date())<0){
 				//process today's log
-				File f_log = config.getFileLog(date);
+				File f_log = config.getFileLogLog(date);
 				process_one_log(f_log);
 				
 				//update config, move to the next date
@@ -114,7 +114,7 @@ public class JobDiscover {
 
 	private void process_one_url(String szUrl, Date date_history) throws Sw4jException {
 		//parse url
-		DataUriUrl uu = DataUriUrl.create(szUrl);
+		DataLodUri uu = DataLodUri.create(szUrl);
 		
 		// get cached document
 		File f_cached = config.getFileCurrent(uu);
@@ -140,11 +140,13 @@ public class JobDiscover {
 		String content1 =String.format("# ontology found for URL %s in FILE %s\n", uu.url , f_cached.getAbsolutePath());
 		String content2 =ToolString.printCollectionToString(stat.listOntologies());
 
-		File f_ontology_todo_log = config.getFileLogOntologyTodo(new Date());
-		ToolIO.pipeStringToFile(content1+content2, f_ontology_todo_log, false, true);
+		if (content2.length()>0){
+			File f_ontology_todo_log = config.getFileLogOntologyTodo(new Date());
+			ToolIO.pipeStringToFile(content1+content2, f_ontology_todo_log, false, true);
 
-		File f_ontology_todo = config.getFileJobOntologyTodo();
-		ToolIO.pipeStringToFile(content2, f_ontology_todo, false, true);
+			//File f_ontology_todo = config.getFileJobOntologyTodo();
+			//ToolIO.pipeStringToFile(content2, f_ontology_todo, false, true);			
+		}
 	}
 	
 	public Logger getLogger(){

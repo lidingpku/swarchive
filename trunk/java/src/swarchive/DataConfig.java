@@ -168,13 +168,14 @@ public class DataConfig extends Properties{
 		return new File(filename);
 	}
 
-	public  File getFileLog(Date date){
+	public  File getFileLogLog(Date date){
 		List<String> paths = createPathsData();
 		paths.add(G_LOG);
 		String filename = formatFileLocation(paths, String.format("%s-log.csv",formatDate(date, "yyyy/yyyy-MM-dd")));
 		return new File(filename);
 	}
-	
+
+
 	public  File getFileLogOntologyTodo(Date date){
 		List<String> paths = createPathsData();
 		paths.add(G_LOG);
@@ -182,7 +183,7 @@ public class DataConfig extends Properties{
 		return new File(filename);
 	}
 	
-	public File getFileCurrent(DataUriUrl uu){
+	public File getFileCurrent(DataLodUri uu){
 		List<String> paths = createPathsData();
 		paths.add(G_CURRENT);
 		paths.add(uu.rel_path_url);
@@ -190,7 +191,7 @@ public class DataConfig extends Properties{
 		return new File(filename);
 	}
 
-	public File getFileCurrentRdf(DataUriUrl uu){
+	public File getFileCurrentRdf(DataLodUri uu){
 		List<String> paths = createPathsData();
 		paths.add(G_CURRENT);
 		paths.add(uu.rel_path_url);
@@ -199,7 +200,7 @@ public class DataConfig extends Properties{
 	}
 
 	
-	public File getFileHistory(DataUriUrl uu, Date date){
+	public File getFileHistory(DataLodUri uu, Date date){
 		List<String> paths = createPathsData();
 		paths.add(G_HISTORY);
 		paths.add(uu.rel_path_url);
@@ -209,6 +210,14 @@ public class DataConfig extends Properties{
 		return new File(filename);
 	}
 
+	public  File getFileHistoryLog(DataLodUri uu, Date date){
+		List<String> paths = createPathsData();
+		paths.add(G_HISTORY);
+		paths.add(uu.rel_path_url);
+		paths.add(uu.norm_url);
+		String filename = formatFileLocation(paths, "changelog.csv");
+		return new File(filename);
+	}
 	
 	public Date getDiscDate(){
 		Date date = new Date();
