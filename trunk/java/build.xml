@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="swarchive" default="discover" basedir=".">
+<project name="swarchive" default="build" basedir=".">
 	<property name="class.dir" value="classes" />
 	<property name="src.dir" value="src" />
 	<property name="lib.dir" value="lib" />
