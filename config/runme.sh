@@ -1,3 +1,4 @@
+date
 cd ..
 cd java
 path_log_archive="`date '+../temp/log-%Y-%m-%d-archive'`"
@@ -9,3 +10,4 @@ ant discover -l $path_log_discover
 cd ..
 cd config
 ./update.sh
+date
