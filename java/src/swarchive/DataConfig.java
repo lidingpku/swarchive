@@ -27,8 +27,8 @@ public class DataConfig extends Properties{
 	public static final String G_FILENAME_DEFAULT = "swarchive.conf";
 	public static final String G_DIR_HOME_DEFAULT = ".";
 
-	public static final String G_FILENAME_SUFFIX_LOG_JOB = "-job.csv";
-	public static final String G_FILENAME_SUFFIX_LOG_LOG = "-log.csv";
+	public static final String G_FILENAME_SUFFIX_LOG_JOB = "-archive-job.csv";
+	public static final String G_FILENAME_SUFFIX_LOG_LOG = "-archive-log.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONTO = "-discover-ontology.csv";
 
 	public static final String G_DATA= "data";
