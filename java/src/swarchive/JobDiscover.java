@@ -47,39 +47,38 @@ public class JobDiscover {
 	}
 	
 	
-	private void run() throws IOException {
+	
+	 	private void run() throws IOException {
 		//process today
 		try{
-			//get today
-			Date date = new Date();
-	
 			//process today's log
-			File f_log = config.getFileLogLog(date);
+			File f_log = config.getFileLogLog( config.getDateJob() );
 			process_one_log(f_log);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+/*
 		//process any day before today
 		try{
 			//get starting date
-			Date date = config.getDiscDate();
+			Date date = config.getDateJob();
 			if (date.compareTo(new Date())<0){
 				//process today's log
 				File f_log = config.getFileLogLog(date);
 				process_one_log(f_log);
 				
 				//update config, move to the next date
-				config.setDiscDate(DataConfig.incrementDate(date));
+				config.setDateJob(DataConfig.incrementDate(date));
 				config.store();				
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+*/
+		}
 	
 	private void process_one_log(File f_log) throws IOException {
 		System.out.println("processing ... "+ f_log.getAbsolutePath());
@@ -141,8 +140,8 @@ public class JobDiscover {
 		String content2 =ToolString.printCollectionToString(stat.listOntologies());
 
 		if (content2.length()>0){
-			File f_ontology_todo_log = config.getFileLogOntologyTodo(new Date());
-			ToolIO.pipeStringToFile(content1+content2, f_ontology_todo_log, false, true);
+			File f_log_discover_ontology = config.getFileLogDiscoverOntology(new Date());
+			ToolIO.pipeStringToFile(content1+content2, f_log_discover_ontology, false, true);
 
 			//File f_ontology_todo = config.getFileJobOntologyTodo();
 			//ToolIO.pipeStringToFile(content2, f_ontology_todo, false, true);			

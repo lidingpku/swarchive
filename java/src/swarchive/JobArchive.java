@@ -37,7 +37,7 @@ public class JobArchive {
 			
 			JobArchive agent = new JobArchive(config);
 			
-			agent.process_job(config.getFileJob(),true);
+			agent.process_job(config.getFileLogJob(),true);
 
 			
 		} catch (FileNotFoundException e) {

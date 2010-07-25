@@ -29,7 +29,7 @@ public class DataConfig extends Properties{
 
 	public static final String G_FILENAME_SUFFIX_LOG_JOB = "-job.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_LOG = "-log.csv";
-	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONTO = "-disc-onto.csv";
+	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONTO = "-discover-ontology.csv";
 
 	public static final String G_DATA= "data";
 	public static final String G_CONFIG= "config";
@@ -41,8 +41,10 @@ public class DataConfig extends Properties{
 	public static final String CONFIG_DIR_HOME = "dir_home";
 	public static final String CONFIG_FILE_SKIP_PATTERN= "file_skip_pattern";
 	public static final String CONFIG_NEW_URL_ONLY= "new_url_only";
+	
+	//provide either a file or a date 
 	public static final String CONFIG_FILE_JOB= "file_job";
-//	public static final String CONFIG_DATE_JOB = "date_job";
+	public static final String CONFIG_DATE_JOB = "date_job";	
 	
 	public File f_conf = new File(G_FILENAME_DEFAULT);
 
@@ -146,13 +148,6 @@ public class DataConfig extends Properties{
 	}
 
 	
-	public File getFileJob(){
-		String filename = this.getProperty(CONFIG_FILE_JOB);
-		if (ToolSafe.isEmpty(filename)){
-			return getFileLogJob( new Date());
-		}
-		return new File(filename);
-	}
 
 
 	public File getFileSkipPattern(){
@@ -162,6 +157,14 @@ public class DataConfig extends Properties{
 		List<String> paths = createPathsConfig();
 		paths.add(G_SEED);
 		String filename = formatFileLocation(paths, this.getProperty(CONFIG_FILE_SKIP_PATTERN));
+		return new File(filename);
+	}
+
+	public File getFileLogJob(){
+		String filename = this.getProperty(CONFIG_FILE_JOB);
+		if (ToolSafe.isEmpty(filename)){
+			return getFileLogJob( getDateJob() );
+		}
 		return new File(filename);
 	}
 
@@ -220,20 +223,24 @@ public class DataConfig extends Properties{
 		return new File(filename);
 	}
 
-	/*
-	public Date getDiscDate(){
+	
+	public void setDateJob(Date date){
+		put(CONFIG_DATE_JOB, formatDate(date, "yyyy-MM-dd") );
+	}
+	
+	public Date getDateJob(){
 		Date date = new Date();
-		String szDate = this.getProperty(CONFIG_JOB_DISC_DATE);
+		String szDate = this.getProperty(CONFIG_DATE_JOB);
 		if (!ToolSafe.isEmpty(szDate))
 			try {
 				date = new SimpleDateFormat("yyyy-MM-dd").parse(szDate);
 			} catch (ParseException e) {
-				getLogger().warn("bad date format in configuration file: " + CONFIG_JOB_DISC_DATE+"="+szDate);
+				getLogger().warn("bad date format in configuration file: " + CONFIG_DATE_JOB+"="+szDate);
 				e.printStackTrace();
 			}
 		return date;
 	}
-	*/
+	
 	public Logger getLogger(){
 		return Logger.getLogger(this.getClass());
 	}
