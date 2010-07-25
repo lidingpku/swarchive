@@ -30,12 +30,15 @@ public class JobArchive {
 		try {
 			
 			DataConfig config = new DataConfig();
-			//load config
+
+			//load configuration file
 			if (args.length>0)
 				config = DataConfig.load(args[0]);
 			
 			JobArchive agent = new JobArchive(config);
-			agent.run_ontology();
+			
+			agent.process_job(config.getFileJob(),true);
+
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -52,17 +55,6 @@ public class JobArchive {
 	}
 	
 	
-	/**
-	 * process user defined ontology seeds
-	 * 
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public void run_ontology() throws FileNotFoundException, IOException{
-		//1. process ontology job
-		process_job(config.getFileJobOntology(),true);
-	}
-	
 	
 
 	/**
@@ -77,7 +69,6 @@ public class JobArchive {
 		System.out.println("processing ... "+ f_jobfile.getAbsolutePath());
 		BufferedReader reader = new BufferedReader(new FileReader(f_jobfile));
 		
-		DataLRUCache<String> visited = new DataLRUCache<String>(1000);
 		
 		String line=null;
 		while (null!=(line=reader.readLine())){
@@ -86,12 +77,7 @@ public class JobArchive {
 			//parse job description
 			if (!job.initFromCsv(line))
 				continue;
-			
-			//avoid duplicated job
-			if (visited.contains(line))
-				continue;
-			visited.add(line);
-			
+						
 			//now process the job
 			archive(job.getAsString(DataJobArchive.JOB_URI), requireRDF);
 			
@@ -99,7 +85,9 @@ public class JobArchive {
 		}
 
 	}
-	
+
+	DataLRUCache<String> visited = new DataLRUCache<String>(1000);
+
 	/**
 	 * archive a single URL
 	 * 
@@ -122,7 +110,7 @@ public class JobArchive {
 		log.put(DataJob.JOB_CNT_TRIPLE, 0);
 		log.put(DataJob.JOB_DUPLICATED, false);
 		
-		//pre-process: validate/parse URI
+		//section 1: pre-process: validate/parse URI
 		DataLodUri uu = null;
 		File file_current =null;
 		try{
@@ -136,32 +124,40 @@ public class JobArchive {
 			
 		} catch (Sw4jException e) {
 			getLogger().info("error: "+ e.getMessage());
+
+			//write to daily log
 			ToolMyUtil.writeCsv(this.config.getFileLogLog(null), log);
 			return;
 		}
 		
-		//pre-process: skip based on configuration
+		//section 2: pre-process: skip based on configuration
 		try{			
+			//1. avoid access the same URL
+			if (visited.contains(uu.url)){
+				visited.add(uu.url);
+				throw new Sw4jException(Sw4jMessage.STATE_INFO, "[skip url: visited in this job] " + uu.url);				
+			}
 
-			//1. check skip pattern file
-			if (skip.testSkip(uu.url))
-				throw new Sw4jException(Sw4jMessage.STATE_INFO, "skip url: " + uu.url);
-
-			//2. check if we only handle new URL
-			if (config.checkNewUrlOnly()){
-				if (file_current.exists()){
-					throw new Sw4jException(Sw4jMessage.STATE_INFO, "skip existing url: " + uu.url);
-				}
+			//2. check skip pattern file
+			if (skip.testSkip(uu.url)){
+				throw new Sw4jException(Sw4jMessage.STATE_INFO, "[skip url: pattern filter] " + uu.url);
+			}
+			
+			//3. check if we only handle new URL
+			if (config.checkNewUrlOnly() && file_current.exists()){
+				throw new Sw4jException(Sw4jMessage.STATE_INFO, "[skip url: new url only] " + uu.url);
 			}
 		} catch (Sw4jException e) {
 			getLogger().info("error: "+ e.getMessage());
+			
+			//write to daily log
 			ToolMyUtil.writeCsv(this.config.getFileLogLog(null), log);
 			return;
 		}
 
 		
+		//section 3: download/validate URL
 		boolean bChanged =false;
-		//process URL
 		try {
 			//download file
 			AgentModelLoader loader= new AgentModelLoader(uu.url);
@@ -184,7 +180,7 @@ public class JobArchive {
 			log.put(DataJob.JOB_SHA1SUM, ToolHash.hash_mbox_sum_sha1(content));
 
 			if (file_current.exists()){
-				bChanged |= (file_current.length()==content.getBytes("UTF-8").length);
+				bChanged = (file_current.length()==content.getBytes("UTF-8").length);
 				
 				if (bChanged){
 					log.put(DataJob.JOB_DUPLICATED, true);
@@ -213,16 +209,16 @@ public class JobArchive {
 				date = new Date(loader.getLoad().getLastmodified());
 			log.put(DataJob.JOB_TS_HISTORY, date.getTime());
 
-			// save history
+			// archive downloaded file (new version)
 			ToolIO.pipeStringToFile(loader.getLoad().getContent(), config.getFileHistory(uu,date));
 
-			// update history log
+			// update change log of the file
 			ToolMyUtil.writeCsv(this.config.getFileHistoryLog(uu, date), log);
 			
-			//save current
+			// replace the current file with the new version
 			ToolIO.pipeStringToFile(loader.getLoad().getContent(), file_current);
 			
-			//save current to RDF
+			// replace the current rdf with the parse result 
 			ToolJena.printModelToFile(loader.getModelData(), config.getFileCurrentRdf(uu));
 			
 		} catch (Sw4jException e) {
@@ -231,9 +227,8 @@ public class JobArchive {
 			getLogger().info("error: "+ e.getMessage());
 		}
 		
-		//generate log
+		//write to daily log
 		ToolMyUtil.writeCsv(this.config.getFileLogLog(null), log);
-
 	}
 	
 	public Logger getLogger(){
