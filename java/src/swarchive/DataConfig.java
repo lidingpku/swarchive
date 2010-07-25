@@ -26,27 +26,30 @@ public class DataConfig extends Properties{
 	
 	public static final String G_FILENAME_DEFAULT = "swarchive.conf";
 	public static final String G_DIR_HOME_DEFAULT = ".";
+
+	public static final String G_FILENAME_SUFFIX_LOG_JOB = "-job.csv";
+	public static final String G_FILENAME_SUFFIX_LOG_LOG = "-log.csv";
+	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONTO = "-disc-onto.csv";
+
 	public static final String G_DATA= "data";
+	public static final String G_CONFIG= "config";
 	public static final String G_SEED = "seed";
 	public static final String G_LOG = "log";
 	public static final String G_CURRENT = "current";
 	public static final String G_HISTORY = "history";
 
 	public static final String CONFIG_DIR_HOME = "dir_home";
-	public static final String CONFIG_JOB_ONTOLOGY = "job_ontology";
-	public static final String CONFIG_JOB_ONTOLOGY_TODO = "job_ontology_todo";
-	public static final String CONFIG_JOB_DISC_DATE = "job_disc_date";
 	public static final String CONFIG_FILE_SKIP_PATTERN= "file_skip_pattern";
 	public static final String CONFIG_NEW_URL_ONLY= "new_url_only";
+	public static final String CONFIG_FILE_JOB= "file_job";
+//	public static final String CONFIG_DATE_JOB = "date_job";
 	
 	public File f_conf = new File(G_FILENAME_DEFAULT);
 
 	public DataConfig(){
 		put(CONFIG_DIR_HOME, G_DIR_HOME_DEFAULT);
-		put(CONFIG_JOB_ONTOLOGY, "job_ontology.csv");
-		put(CONFIG_JOB_ONTOLOGY_TODO, "job_ontology_todo.csv");
 		put(CONFIG_FILE_SKIP_PATTERN, "skip_pattern.txt");
-		put(CONFIG_JOB_DISC_DATE, formatDate(null, "yyyy-MM-dd"));
+		put(CONFIG_NEW_URL_ONLY, false);
 	}
 
 	
@@ -124,9 +127,7 @@ public class DataConfig extends Properties{
 		return c.getTime();  // dt is now the new date
 	}
 	
-	public void setDiscDate(Date date){
-		this.setProperty(CONFIG_JOB_DISC_DATE, formatDate(date,"yyyy-MM-dd"));
-	}
+//	
 	
 	public List<String> createPathsData(){
 		ArrayList<String> paths= new ArrayList<String>();
@@ -136,51 +137,51 @@ public class DataConfig extends Properties{
 		return paths;
 	}
 	
+	public List<String> createPathsConfig(){
+		ArrayList<String> paths= new ArrayList<String>();
+		paths.add(getProperty(CONFIG_DIR_HOME, G_DIR_HOME_DEFAULT));
+		paths.add(G_CONFIG);
+		
+		return paths;
+	}
 
 	
-	public File getFileJobOntology(){
-		if (ToolSafe.isEmpty( this.getProperty(CONFIG_JOB_ONTOLOGY)))
-			return null;
-		
-		List<String> paths = createPathsData();
-		paths.add(G_SEED);
-		String filename = formatFileLocation(paths, this.getProperty(CONFIG_JOB_ONTOLOGY));
+	public File getFileJob(){
+		String filename = this.getProperty(CONFIG_FILE_JOB);
+		if (ToolSafe.isEmpty(filename)){
+			return getFileLogJob( new Date());
+		}
 		return new File(filename);
 	}
 
-	public File getFileJobOntologyTodo(){
-		if (ToolSafe.isEmpty( this.getProperty(CONFIG_JOB_ONTOLOGY_TODO)))
-			return null;
-		
-		List<String> paths = createPathsData();
-		paths.add(G_SEED);
-		String filename = formatFileLocation(paths, this.getProperty(CONFIG_JOB_ONTOLOGY_TODO));
-		return new File(filename);
-	}
 
 	public File getFileSkipPattern(){
 		if (ToolSafe.isEmpty( this.getProperty(CONFIG_FILE_SKIP_PATTERN)))
 			return null;
 		
-		List<String> paths = createPathsData();
+		List<String> paths = createPathsConfig();
 		paths.add(G_SEED);
 		String filename = formatFileLocation(paths, this.getProperty(CONFIG_FILE_SKIP_PATTERN));
 		return new File(filename);
 	}
 
-	public  File getFileLogLog(Date date){
-		List<String> paths = createPathsData();
-		paths.add(G_LOG);
-		String filename = formatFileLocation(paths, String.format("%s-log.csv",formatDate(date, "yyyy/yyyy-MM-dd")));
-		return new File(filename);
+	public  File getFileLogJob(Date date){
+		return getFileLog(date, G_FILENAME_SUFFIX_LOG_JOB);
 	}
 
+	public  File getFileLogLog(Date date){
+		return getFileLog(date, G_FILENAME_SUFFIX_LOG_LOG);
+	}
 
-	public  File getFileLogOntologyTodo(Date date){
+	public  File getFileLogDiscoverOntology(Date date){
+		return getFileLog(date, G_FILENAME_SUFFIX_LOG_DISC_ONTO);
+	}
+	
+	private File getFileLog(Date date, String filename_suffix){
 		List<String> paths = createPathsData();
 		paths.add(G_LOG);
-		String filename = formatFileLocation(paths, String.format("%s-log-ontology-todo.csv",formatDate(date, "yyyy/yyyy-MM-dd")));
-		return new File(filename);
+		String filename = formatFileLocation(paths, String.format("%s%s",formatDate(new Date(), "yyyy/yyyy-MM-dd"),filename_suffix));
+		return new File(filename);		
 	}
 	
 	public File getFileCurrent(DataLodUri uu){
@@ -218,7 +219,8 @@ public class DataConfig extends Properties{
 		String filename = formatFileLocation(paths, "changelog.csv");
 		return new File(filename);
 	}
-	
+
+	/*
 	public Date getDiscDate(){
 		Date date = new Date();
 		String szDate = this.getProperty(CONFIG_JOB_DISC_DATE);
@@ -231,7 +233,7 @@ public class DataConfig extends Properties{
 			}
 		return date;
 	}
-	
+	*/
 	public Logger getLogger(){
 		return Logger.getLogger(this.getClass());
 	}
