@@ -27,6 +27,9 @@ public class DataConfig extends Properties{
 	public static final String G_FILENAME_DEFAULT = "swarchive.conf";
 	public static final String G_DIR_HOME_DEFAULT = ".";
 
+	public static final String G_FILENAME_CHANGELOG = "changelog.v1.csv";
+	public static final String G_PATH_PATTERN_DATE = "yyyy-MM-dd";
+
 	public static final String G_FILENAME_SUFFIX_LOG_JOB = "-archive-job.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_LOG = "-archive-log.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONTO = "-discover-ontology.csv";
@@ -183,7 +186,7 @@ public class DataConfig extends Properties{
 	private File getFileLog(Date date, String filename_suffix){
 		List<String> paths = createPathsData();
 		paths.add(G_LOG);
-		String filename = formatFileLocation(paths, String.format("%s%s",formatDate(new Date(), "yyyy/yyyy-MM-dd"),filename_suffix));
+		String filename = formatFileLocation(paths, String.format("%s%s",formatDate(new Date(), "yyyy/"+G_PATH_PATTERN_DATE),filename_suffix));
 		return new File(filename);		
 	}
 	
@@ -209,7 +212,7 @@ public class DataConfig extends Properties{
 		paths.add(G_HISTORY);
 		paths.add(uu.rel_path_url);
 		paths.add(uu.norm_url);
-		paths.add(formatDate(date, "yyyy-MM-dd") );
+		paths.add(formatDate(date, G_PATH_PATTERN_DATE) );
 		String filename = formatFileLocation(paths, uu.norm_url);
 		return new File(filename);
 	}
@@ -219,13 +222,13 @@ public class DataConfig extends Properties{
 		paths.add(G_HISTORY);
 		paths.add(uu.rel_path_url);
 		paths.add(uu.norm_url);
-		String filename = formatFileLocation(paths, "changelog.csv");
+		String filename = formatFileLocation(paths, G_FILENAME_CHANGELOG);
 		return new File(filename);
 	}
 
 	
 	public void setDateJob(Date date){
-		put(CONFIG_DATE_JOB, formatDate(date, "yyyy-MM-dd") );
+		put(CONFIG_DATE_JOB, formatDate(date, G_PATH_PATTERN_DATE) );
 	}
 	
 	public Date getDateJob(){
@@ -233,7 +236,7 @@ public class DataConfig extends Properties{
 		String szDate = this.getProperty(CONFIG_DATE_JOB);
 		if (!ToolSafe.isEmpty(szDate))
 			try {
-				date = new SimpleDateFormat("yyyy-MM-dd").parse(szDate);
+				date = new SimpleDateFormat(G_PATH_PATTERN_DATE).parse(szDate);
 			} catch (ParseException e) {
 				getLogger().warn("bad date format in configuration file: " + CONFIG_DATE_JOB+"="+szDate);
 				e.printStackTrace();
