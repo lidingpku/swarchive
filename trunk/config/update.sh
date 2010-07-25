@@ -5,6 +5,10 @@ path_tomorrow_job="`date --date=tomorrow '+../data/log/%Y/%Y-%m-%d-archive-job.c
 #echo $path_today_disc_o
 #echo $path_today_job
 #echo $path_tomorrow_job
+path1="`date '+../data/log/'`"
+mkdir $path1
+path2="`date --date=tomorrow '+../data/log/%Y/'`"
+mkdir $path2
 cat $path_today_disc_o $path_today_job > temp_job
 #sed -i '/^\#/d' temp_job
 sed -i 's/\#.*//' temp_job
