@@ -27,7 +27,7 @@ public class DataConfig extends Properties{
 	public static final String G_FILENAME_DEFAULT = "swarchive.conf";
 	public static final String G_DIR_HOME_DEFAULT = ".";
 
-	public static final String G_FILENAME_CHANGELOG = "changelog.v2.csv";
+	public static final String G_FILENAME_CHANGELOG = "changelog.v3.csv";
 	public static final String G_FILENAME_STATUS_ONLINE = "online.status";
 
 	public static final String G_PATH_PATTERN_DATE = "yyyy-MM-dd";
@@ -192,7 +192,7 @@ public class DataConfig extends Properties{
 	private File getFileLog(Date date, String filename_suffix){
 		List<String> paths = createPathsData();
 		paths.add(G_LOG);
-		String filename = formatFileLocation(paths, String.format("%s%s",formatDate(new Date(), "yyyy/"+G_PATH_PATTERN_DATE),filename_suffix));
+		String filename = formatFileLocation(paths, String.format("%s%s",formatDate(date, "yyyy/"+G_PATH_PATTERN_DATE),filename_suffix));
 		return new File(filename);		
 	}
 
@@ -201,7 +201,7 @@ public class DataConfig extends Properties{
 		List<String> paths = createPathsData();
 		paths.add(G_INDEX);
 		paths.add(G_RSS);
-		String filename = formatFileLocation(paths, String.format("%s%s",formatDate(new Date(), "yyyy/"+G_PATH_PATTERN_DATE),filename_suffix));
+		String filename = formatFileLocation(paths, String.format("%s%s",formatDate( date, "yyyy/"+G_PATH_PATTERN_DATE),filename_suffix));
 		return new File(filename);		
 	}
 
@@ -281,6 +281,6 @@ public class DataConfig extends Properties{
 	}
 	
 	public boolean checkNewUrlOnly(){
-		return this.containsKey(CONFIG_NEW_URL_ONLY);
+		return this.containsKey(CONFIG_NEW_URL_ONLY) && this.get(CONFIG_NEW_URL_ONLY).equals("true");
 	}
 }

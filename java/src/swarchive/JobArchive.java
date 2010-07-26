@@ -152,7 +152,7 @@ public class JobArchive {
 			}
 			
 			//3. check if we only handle new URL
-			if (config.checkNewUrlOnly() && file_current.exists()){
+			if (config.checkNewUrlOnly() && bCached){
 				throw new Sw4jException(Sw4jMessage.STATE_INFO, "[skip url: new url only] " + uu.url);
 			}
 		} catch (Sw4jException e) {
@@ -257,12 +257,12 @@ public class JobArchive {
 	
 	public void save_change_type(DataSmartMap log, DataLodUri uu, Date date){
 
-		get_change_type(log);
+		String change_type = get_change_type(log);
 
 		boolean bOnlineNow= log.getAsString(DataJob.JOB_CHANGE_ONLINE_NOW).equals("true");
 
 		//write RSS - which files were changed on that date;
-		if (bOnlineNow){
+		if (!change_type.equals(DataJob.VALUE_CHANGE_TYPE_SKIP)&& !change_type.equals(DataJob.VALUE_CHANGE_TYPE_SAME)){
 			ToolMyUtil.writeCsv(this.config.getFileIndexRss(date), log);
 		}
 		
