@@ -94,13 +94,16 @@ public class JobDiscover {
 			if (!job.initFromCsv(line))
 				continue;
 			
+			if (!job.is_content_changed())
+				continue;
+			
 			//now process the job
 			try {
-				String historytime =job.getAsString(DataJob.JOB_TS_HISTORY); 
-				if (!ToolSafe.isEmpty(historytime))
-						process_one_url(job.getAsString(DataJob.JOB_URL), new Date(Long.parseLong(historytime)));
+				String modifytime =job.getAsString(DataJob.JOB_TS_MODIFIED); 
+				if (!ToolSafe.isEmpty(modifytime))
+						process_one_url(job.getAsString(DataJob.JOB_URL), new Date(Long.parseLong(modifytime)));
 				else
-					getLogger().info("bad lines in job description (ts_history): " + job.toString());
+					getLogger().info("bad lines in job description (ts_modified): " + job.toString());
 			} catch (NumberFormatException e) {
 				getLogger().warn(e.getMessage());
 			} catch (Sw4jException e) {
