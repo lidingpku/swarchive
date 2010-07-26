@@ -77,6 +77,8 @@ define("G_WEB_VERSION", G_ROOT_WEB."/version.php?version=");
 
 define("INPUT_URI", "uri");
 
+require_once("inc/ToolUri.php");
+
 
 /********************************************************************************
  Section 4  Source code - main function
@@ -112,14 +114,19 @@ if (empty($params_all[INPUT_URI])){
 
 
 //print_r($params_input);
+$uri = $params_all[INPUT_URI];
 
-$url = uri2url($params_all[INPUT_URI]);
+$url = ToolUri::get_url($uri);
+
 $url_encode= urlencode($url);
 
 
 
 $params = array();
 $params["title"]="changelog for $url";
+if (strcmp($url, $uri)!=0){
+	$params["title"] .= " (based on URI $uri)";
+}
 $params["link"]= sprintf("%s%s", G_WEB_RSS, $url_encode);
 print_rss_header("",$params);
 
@@ -156,9 +163,6 @@ print_rss_footer();
 
 
 
-function uri2url($uri){
-	return $uri;
-}
 
 function get_url_encoded($url){
 	return urlencode($url);
