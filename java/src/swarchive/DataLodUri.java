@@ -3,7 +3,6 @@ package swarchive;
 
 import java.net.URI;
 
-import sw4j.util.DataQname;
 import sw4j.util.Sw4jException;
 import sw4j.util.ToolHash;
 import sw4j.util.ToolSafe;
@@ -22,7 +21,7 @@ public class DataLodUri {
 	public static DataLodUri create(String szUri) throws Sw4jException{
 		DataLodUri data = new DataLodUri();
 		data.uri= szUri;
-		data.url = DataQname.extractNamespaceUrl(szUri);
+		data.url = ToolURI.uri2url(szUri);
 		if (null==data.url)
 			data.url=data.uri;
 //		data.filename_url = filenameUrl(data.url);
