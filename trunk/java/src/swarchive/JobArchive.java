@@ -187,7 +187,7 @@ public class JobArchive {
 						skip.add(String.format("%s.+",host_url.replace(".", "\\.")), true);
 				}
 				
-				set_change_type( log, uu, dateModify);
+				save_change_type( log, uu, dateModify);
 				
 				throw new Sw4jException(Sw4jMessage.STATE_INFO, "load failed: " + loader.getLoad().getReport().toCSVrow());
 			}
@@ -202,7 +202,7 @@ public class JobArchive {
 				log.put(DataJob.JOB_CHANGE_CONTENT_CHANGED, bChanged);
 			}
 			
-			set_change_type(log, uu, dateModify);										
+			save_change_type(log, uu, dateModify);										
 
 			// skip unchanged data
 			if (bCached && !bChanged){
@@ -253,7 +253,7 @@ public class JobArchive {
 		return Logger.getLogger(this.getClass());
 	}
 	
-	public void set_change_type(DataSmartMap log, DataLodUri uu, Date date){
+	public void save_change_type(DataSmartMap log, DataLodUri uu, Date date){
 
 		get_change_type(log);
 
