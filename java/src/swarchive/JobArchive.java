@@ -157,7 +157,7 @@ public class JobArchive {
 
 		
 		//section 3: download/validate URL
-		boolean bChanged =false;
+		boolean bDuplicated = false;
 		try {
 			//download file
 			AgentModelLoader loader= new AgentModelLoader(uu.url);
@@ -180,10 +180,11 @@ public class JobArchive {
 			log.put(DataJob.JOB_SHA1SUM, ToolHash.hash_mbox_sum_sha1(content));
 
 			if (file_current.exists()){
-				bChanged = (file_current.length()==content.getBytes("UTF-8").length);
+				bDuplicated = (file_current.length() == content.getBytes("UTF-8").length);
 				
-				if (bChanged){
-					log.put(DataJob.JOB_DUPLICATED, true);
+				
+				if (bDuplicated){
+					log.put(DataJob.JOB_DUPLICATED, bDuplicated);
 					throw new Sw4jException(Sw4jMessage.STATE_INFO, "duplicate content (by file length)." );
 				}
 			}
