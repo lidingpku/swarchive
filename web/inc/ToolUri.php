@@ -1,14 +1,12 @@
 <?php
 class ToolUri{
-  public static function get_url($uri){
-	$namespace = ToolUri::get_namespace($uri);
-
-	$index = strpos( $namespace , "#");
+  public static function uri2url($uri){
+	$index = strpos( $uri , "#");
 	if ($index !== FALSE ) {
-		$namespace = substr($namespace, 0, strlen($namespace) );
+		return substr($uri, 0, $index );
+	}else{
+		return $uri;
 	}
-
-	return $namespace;
   }
 
   public static function get_namespace($uri){
