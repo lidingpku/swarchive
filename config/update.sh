@@ -9,7 +9,7 @@ path1="`date '+../data/log/'`"
 mkdir $path1
 path2="`date --date=tomorrow '+../data/log/%Y/'`"
 mkdir $path2
-cat $path_today_disc_o $path_today_job > temp_job
+cat $path_today_disc_o $path_today_job seed/job_ontology.csv seed/job_datagov.csv > temp_job
 #sed -i '/^\#/d' temp_job
 sed -i 's/\#.*//' temp_job
 sed -i '/^file/d' temp_job
