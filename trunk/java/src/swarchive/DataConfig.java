@@ -27,7 +27,7 @@ public class DataConfig extends Properties{
 	public static final String G_FILENAME_DEFAULT = "swarchive.conf";
 	public static final String G_DIR_HOME_DEFAULT = ".";
 
-	public static final String G_FILENAME_CHANGELOG = "changelog.v1.csv";
+	public static final String G_FILENAME_CHANGELOG = "changelog.v2.csv";
 	public static final String G_FILENAME_STATUS_ONLINE = "online.status";
 
 	public static final String G_PATH_PATTERN_DATE = "yyyy-MM-dd";
