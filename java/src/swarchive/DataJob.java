@@ -19,17 +19,18 @@ public abstract class DataJob extends DataSmartMap{
 	public static final String JOB_REQUIRERDF ="requireRDF";
 	
 	public static final String JOB_CHANGE_TYPE ="change_type";
-	public static final String JOB_CHANGE_ONLINE_BEFORE ="change_online_before";
-	public static final String JOB_CHANGE_ONLINE_NOW ="change_online_now";
-	public static final String JOB_CHANGE_CONTENT_CACHED ="change_content_cached";
-	public static final String JOB_CHANGE_CONTENT_CHANGED ="change_content_changed";
+	public static final String JOB_CHANGE_ONLINE_BEFORE ="change_online_before";	//previously status: online
+	public static final String JOB_CHANGE_ONLINE_NOW ="change_online_now";	//current status: online
+	public static final String JOB_CHANGE_CONTENT_CACHED ="change_content_cached";	//old version exists
+	public static final String JOB_CHANGE_CONTENT_CHANGED ="change_content_changed";	// old version exists, plus the new version is different from the old version, a new version has been cached
 
 	
-	public static final String VALUE_CHANGE_TYPE_NEW= "new";
+	public static final String VALUE_CHANGE_TYPE_NEW= "new";	
 	public static final String VALUE_CHANGE_TYPE_UPDATE= "update";
 	public static final String VALUE_CHANGE_TYPE_SAME = "same";
 	public static final String VALUE_CHANGE_TYPE_ONLINE= "online";
 	public static final String VALUE_CHANGE_TYPE_OFFLINE= "offline";
+	public static final String VALUE_CHANGE_TYPE_SKIP= "skip";
 	
 	abstract public String[] getFields();
 

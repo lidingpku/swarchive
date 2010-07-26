@@ -199,8 +199,10 @@ public class JobArchive {
 			//check for change
 			if (bCached){
 				bChanged = (file_current.length() != content.getBytes("UTF-8").length);
-				log.put(DataJob.JOB_CHANGE_CONTENT_CHANGED, bChanged);
+			}else{
+				bChanged = true;
 			}
+			log.put(DataJob.JOB_CHANGE_CONTENT_CHANGED, bChanged);
 			
 			save_change_type(log, uu, dateModify);										
 
@@ -271,6 +273,18 @@ public class JobArchive {
 			this.config.getFileHistoryStatusOnline(uu).delete();			
 		}
 	}
+	
+	/*
+cached	online		loaded	changed		type
+T	X		T	T		update
+F	X		T	X		new
+T	T		F	X		offline
+T	F		F	X		skip
+F	X		F	X		skip
+T	T		T	F		same
+T	F		T	F		online
+	 
+	 */
 		
 	public static String get_change_type(DataSmartMap log){
 		boolean bCached = log.getAsString(DataJob.JOB_CHANGE_CONTENT_CACHED).equals("true");
@@ -284,10 +298,12 @@ public class JobArchive {
 			change_type= DataJob.VALUE_CHANGE_TYPE_UPDATE;
 		}else if (!bCached && bOnlineNow){
 			change_type= DataJob.VALUE_CHANGE_TYPE_NEW;
-		}else if (bOnlineBefore && !bOnlineNow){
+		}else if (bCached &&  bOnlineBefore && !bOnlineNow){
 			change_type= DataJob.VALUE_CHANGE_TYPE_OFFLINE;
 		}else if (bCached && !bOnlineBefore && !bOnlineNow ){
-			change_type= DataJob.VALUE_CHANGE_TYPE_SAME;
+			change_type= DataJob.VALUE_CHANGE_TYPE_SKIP;
+		}else if (!bCached && !bOnlineNow ){
+			change_type= DataJob.VALUE_CHANGE_TYPE_SKIP;
 		}else if (bCached && bOnlineBefore && bOnlineNow && !bChanged){
 			change_type= DataJob.VALUE_CHANGE_TYPE_SAME;
 		}else if (bCached && !bOnlineBefore && bOnlineNow && !bChanged){
