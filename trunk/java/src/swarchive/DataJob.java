@@ -27,9 +27,9 @@ public abstract class DataJob extends DataSmartMap{
 	
 	public static final String VALUE_CHANGE_TYPE_NEW= "new";	
 	public static final String VALUE_CHANGE_TYPE_UPDATE= "update";
-	public static final String VALUE_CHANGE_TYPE_SAME = "same";
 	public static final String VALUE_CHANGE_TYPE_ONLINE= "online";
 	public static final String VALUE_CHANGE_TYPE_OFFLINE= "offline";
+	public static final String VALUE_CHANGE_TYPE_SAME = "same";
 	public static final String VALUE_CHANGE_TYPE_SKIP= "skip";
 	
 	abstract public String[] getFields();
