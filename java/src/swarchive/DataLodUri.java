@@ -46,7 +46,7 @@ public class DataLodUri {
 
 
 	public static String hashUrl(String szUrl){
-		return ToolHash.hash_mbox_sum_sha1(szUrl);
+		return ToolHash.hash_sum_sha1(szUrl.getBytes());
 	}
 	
 	public static String normUrl(String szUrl) throws Sw4jException{
