@@ -1,0 +1,5 @@
+RewriteEngine On
+#Override All
+
+RewriteRule ^rss/(.*)$ /swarchive/rss.php?uri=$1 [R=302]
+#RewriteRule ^version/(.*)$ /swarchive/version.php?version=$1 [R=302]
