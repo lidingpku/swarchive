@@ -116,7 +116,7 @@ if (empty($params_all[INPUT_URI])){
 //print_r($params_input);
 $uri = $params_all[INPUT_URI];
 
-$url = ToolUri::get_url($uri);
+$url = ToolUri::uri2url($uri);
 
 $url_encode= urlencode($url);
 

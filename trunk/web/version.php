@@ -90,7 +90,7 @@ $params_input[INPUT_URI] = substr($params_input[INPUT_VERSION],11);
 
 //print_r($params_input);
 
-$url = uri2url($params_input[INPUT_URI]);
+$url = ToolUri::uri2url($params_input[INPUT_URI]);
 $url_encode= urlencode($url);
 
 $file_version = sprintf("%s/%s/%s",get_dir_history($url), $params_input[INPUT_DATE], $url_encode);
@@ -99,9 +99,6 @@ $file_version = sprintf("%s/%s/%s",get_dir_history($url), $params_input[INPUT_DA
 echo file_get_contents($file_version);
 
 
-function uri2url($uri){
-	return $uri;
-}
 
 function get_url_encoded($url){
 	return urlencode($url);
