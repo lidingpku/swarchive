@@ -11,12 +11,26 @@ public abstract class DataJob extends DataSmartMap{
 	public static final String JOB_URL ="url";
 	public static final String JOB_CNT_LENGTH ="cnt_length";
 	public static final String JOB_CNT_TRIPLE ="cnt_triple";
-	public static final String JOB_DUPLICATED ="duplicated";
-	public static final String JOB_TS_HISTORY ="ts_history";
-	public static final String JOB_TS_JOB ="ts_job";
-	public static final String JOB_TS_MODIFIED ="ts_modified";
-	public static final String JOB_REQUIRERDF ="requireRDF";
 
+	public static final String JOB_TS_JOB ="ts_job";			// must, 
+	public static final String JOB_TS_MODIFIED ="ts_modified";	// if downloaded
+//	public static final String JOB_TS_HISTORY ="ts_history";	// if downloaed and cached
+
+	public static final String JOB_REQUIRERDF ="requireRDF";
+	
+	public static final String JOB_CHANGE_TYPE ="change_type";
+	public static final String JOB_CHANGE_ONLINE_BEFORE ="change_online_before";
+	public static final String JOB_CHANGE_ONLINE_NOW ="change_online_now";
+	public static final String JOB_CHANGE_CONTENT_CACHED ="change_content_cached";
+	public static final String JOB_CHANGE_CONTENT_CHANGED ="change_content_changed";
+
+	
+	public static final String VALUE_CHANGE_TYPE_NEW= "new";
+	public static final String VALUE_CHANGE_TYPE_UPDATE= "update";
+	public static final String VALUE_CHANGE_TYPE_SAME = "same";
+	public static final String VALUE_CHANGE_TYPE_ONLINE= "online";
+	public static final String VALUE_CHANGE_TYPE_OFFLINE= "offline";
+	
 	abstract public String[] getFields();
 
 	

@@ -6,12 +6,17 @@ public class DataJobDiscover extends DataJob{
 	@Override
 	public String[] getFields() {
 		final String [] fields= new String[]{
+				JOB_CHANGE_TYPE,
+				JOB_CHANGE_CONTENT_CACHED,
+				JOB_CHANGE_CONTENT_CHANGED,
+				JOB_CHANGE_ONLINE_BEFORE,
+				JOB_CHANGE_ONLINE_NOW,
+				
 				JOB_CNT_LENGTH ,
 				JOB_CNT_TRIPLE ,
-				JOB_DUPLICATED ,
 				JOB_REQUIRERDF ,
 				JOB_SHA1SUM ,
-				JOB_TS_HISTORY ,
+//				JOB_TS_HISTORY ,
 				JOB_TS_JOB ,
 				JOB_TS_MODIFIED ,
 				JOB_URI,
@@ -20,5 +25,9 @@ public class DataJobDiscover extends DataJob{
 		return fields;
 	}
 	
+	public boolean is_content_changed(){
+		String temp = this.getAsString(JOB_CHANGE_TYPE);
+		return temp.equals(VALUE_CHANGE_TYPE_NEW) || temp.equals(VALUE_CHANGE_TYPE_UPDATE);
+	}
 
 }

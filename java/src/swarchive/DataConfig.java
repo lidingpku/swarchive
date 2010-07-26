@@ -28,16 +28,21 @@ public class DataConfig extends Properties{
 	public static final String G_DIR_HOME_DEFAULT = ".";
 
 	public static final String G_FILENAME_CHANGELOG = "changelog.v1.csv";
+	public static final String G_FILENAME_STATUS_ONLINE = "online.status";
+
 	public static final String G_PATH_PATTERN_DATE = "yyyy-MM-dd";
 
 	public static final String G_FILENAME_SUFFIX_LOG_JOB = "-archive-job.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_LOG = "-archive-log.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONTO = "-discover-ontology.csv";
+	public static final String G_FILENAME_SUFFIX_INDEX_RSS = "-rss.csv";
 
 	public static final String G_DATA= "data";
 	public static final String G_CONFIG= "config";
 	public static final String G_SEED = "seed";
 	public static final String G_LOG = "log";
+	public static final String G_INDEX = "index";
+	public static final String G_RSS = "rss";
 	public static final String G_CURRENT = "current";
 	public static final String G_HISTORY = "history";
 
@@ -179,6 +184,7 @@ public class DataConfig extends Properties{
 		return getFileLog(date, G_FILENAME_SUFFIX_LOG_LOG);
 	}
 
+
 	public  File getFileLogDiscoverOntology(Date date){
 		return getFileLog(date, G_FILENAME_SUFFIX_LOG_DISC_ONTO);
 	}
@@ -189,7 +195,16 @@ public class DataConfig extends Properties{
 		String filename = formatFileLocation(paths, String.format("%s%s",formatDate(new Date(), "yyyy/"+G_PATH_PATTERN_DATE),filename_suffix));
 		return new File(filename);		
 	}
-	
+
+	public  File getFileIndexRss(Date date){
+		String filename_suffix = G_FILENAME_SUFFIX_INDEX_RSS;
+		List<String> paths = createPathsData();
+		paths.add(G_INDEX);
+		paths.add(G_RSS);
+		String filename = formatFileLocation(paths, String.format("%s%s",formatDate(new Date(), "yyyy/"+G_PATH_PATTERN_DATE),filename_suffix));
+		return new File(filename);		
+	}
+
 	public File getFileCurrent(DataLodUri uu){
 		List<String> paths = createPathsData();
 		paths.add(G_CURRENT);
@@ -206,6 +221,15 @@ public class DataConfig extends Properties{
 		return new File(filename);
 	}
 
+	public File getDirHistory(DataLodUri uu){
+		List<String> paths = createPathsData();
+		paths.add(G_HISTORY);
+		paths.add(uu.rel_path_url);
+		paths.add(uu.norm_url);
+		String filename = formatFileLocation(paths, "");
+		return new File(filename);
+	}
+
 	
 	public File getFileHistory(DataLodUri uu, Date date){
 		List<String> paths = createPathsData();
@@ -217,7 +241,7 @@ public class DataConfig extends Properties{
 		return new File(filename);
 	}
 
-	public  File getFileHistoryLog(DataLodUri uu, Date date){
+	public  File getFileHistoryLog(DataLodUri uu){
 		List<String> paths = createPathsData();
 		paths.add(G_HISTORY);
 		paths.add(uu.rel_path_url);
@@ -226,6 +250,14 @@ public class DataConfig extends Properties{
 		return new File(filename);
 	}
 
+	public  File getFileHistoryStatusOnline(DataLodUri uu){
+		List<String> paths = createPathsData();
+		paths.add(G_HISTORY);
+		paths.add(uu.rel_path_url);
+		paths.add(uu.norm_url);
+		String filename = formatFileLocation(paths, G_FILENAME_STATUS_ONLINE);
+		return new File(filename);
+	}
 	
 	public void setDateJob(Date date){
 		put(CONFIG_DATE_JOB, formatDate(date, G_PATH_PATTERN_DATE) );

@@ -102,17 +102,20 @@ public class JobArchive {
 		log.put(DataJob.JOB_REQUIRERDF, requireRDF);
 		log.put(DataJob.JOB_URL, "");
 //		log.put("filename", "");
+		log.put(DataJob.JOB_CHANGE_TYPE, "");
+		log.put(DataJob.JOB_CHANGE_ONLINE_BEFORE, "");
+		log.put(DataJob.JOB_CHANGE_ONLINE_NOW, "");
+		log.put(DataJob.JOB_CHANGE_CONTENT_CACHED, "");
+		log.put(DataJob.JOB_CHANGE_CONTENT_CHANGED, "");
+		
 		log.put(DataJob.JOB_CNT_LENGTH, "");
 		log.put(DataJob.JOB_TS_JOB, System.currentTimeMillis());
 		log.put(DataJob.JOB_TS_MODIFIED, "");
-		log.put(DataJob.JOB_TS_HISTORY, "");
 		log.put(DataJob.JOB_SHA1SUM, "");
 		log.put(DataJob.JOB_CNT_TRIPLE, 0);
-		log.put(DataJob.JOB_DUPLICATED, false);
 		
 		//section 1: pre-process: validate/parse URI
 		DataLodUri uu = null;
-		File file_current =null;
 		try{
 			uu = DataLodUri.create(szUri);
 
@@ -120,8 +123,6 @@ public class JobArchive {
 			log.put(DataJob.JOB_URL, uu.url);
 //			log.put("filename", uu.filename_url);
 
-			file_current = config.getFileCurrent(uu);
-			
 		} catch (Sw4jException e) {
 			getLogger().info("error: "+ e.getMessage());
 
@@ -130,6 +131,13 @@ public class JobArchive {
 			return;
 		}
 		
+		File file_current = config.getFileCurrent(uu);
+		boolean bCached = file_current.exists();
+		log.put(DataJob.JOB_CHANGE_CONTENT_CACHED, bCached);
+
+		boolean bOnline = config.getFileHistoryStatusOnline(uu).exists();
+		log.put(DataJob.JOB_CHANGE_ONLINE_BEFORE, bOnline);
+
 		//section 2: pre-process: skip based on configuration
 		try{			
 			//1. avoid access the same URL
@@ -157,13 +165,21 @@ public class JobArchive {
 
 		
 		//section 3: download/validate URL
-		boolean bDuplicated = false;
-		try {
-			//download file
-			AgentModelLoader loader= new AgentModelLoader(uu.url);
 
-			if (!loader.getLoad().isLoadSucceed()){
-				
+		//download file
+		AgentModelLoader loader= new AgentModelLoader(uu.url);
+		boolean  bLoaded = loader.getLoad().isLoadSucceed();
+		log.put(DataJob.JOB_CHANGE_ONLINE_NOW, bLoaded);
+
+		// get modification date
+		Date dateModify = new Date();
+		if (bLoaded && loader.getLoad().getLastmodified()>0)
+			dateModify = new Date(loader.getLoad().getLastmodified());
+		log.put(DataJob.JOB_TS_MODIFIED, dateModify.getTime());
+
+		boolean bChanged = false;
+		try {
+			if (!bLoaded){
 				//if the site is not accessible, skip it
 				if (loader.getLoad().getState()==TaskLoad.STATE_OUTPUT_FAILED_CONNECTION_CANNOT_OPEN){
 					String host_url = uu.getHostUrl();
@@ -171,50 +187,51 @@ public class JobArchive {
 						skip.add(String.format("%s.+",host_url.replace(".", "\\.")), true);
 				}
 				
+				set_change_type( log, uu, dateModify);
+				
 				throw new Sw4jException(Sw4jMessage.STATE_INFO, "load failed: " + loader.getLoad().getReport().toCSVrow());
 			}
 
-			//check for change
 			String content = loader.getLoad().getContent();
 			log.put(DataJob.JOB_CNT_LENGTH, content.length());
 			log.put(DataJob.JOB_SHA1SUM, ToolHash.hash_mbox_sum_sha1(content));
+			
+			//check for change
+			if (bCached){
+				bChanged = (file_current.length() != content.getBytes("UTF-8").length);
+				log.put(DataJob.JOB_CHANGE_CONTENT_CHANGED, bChanged);
+			}
+			
+			set_change_type(log, uu, dateModify);										
 
-			if (file_current.exists()){
-				bDuplicated = (file_current.length() == content.getBytes("UTF-8").length);
-				
-				
-				if (bDuplicated){
-					log.put(DataJob.JOB_DUPLICATED, bDuplicated);
-					throw new Sw4jException(Sw4jMessage.STATE_INFO, "duplicate content (by file length)." );
-				}
+			// skip unchanged data
+			if (bCached && !bChanged){
+				throw new Sw4jException(Sw4jMessage.STATE_INFO, "duplicate content (by file length)." );
 			}
 			
 			//continue process if the file has been changed
+			
+			if (null != loader.getModelData()){
+				log.put(DataJob.JOB_CNT_TRIPLE, loader.getModelData().size());
+			}
 			
 			//check RDF
 			if (requireRDF){
 				if (null== loader.getModelData()){
 					throw new Sw4jException(Sw4jMessage.STATE_INFO, "need RDF." );
 				}					
-				log.put(DataJob.JOB_CNT_TRIPLE, loader.getModelData().size());
 			}
+			
 
-			//record modification timestamp
-			log.put(DataJob.JOB_TS_MODIFIED, loader.getLoad().getLastmodified());
 
 			//save file to appropriate folder
 			
-			// get history date
-			Date date = new Date();
-			if (loader.getLoad().getLastmodified()>0)
-				date = new Date(loader.getLoad().getLastmodified());
-			log.put(DataJob.JOB_TS_HISTORY, date.getTime());
 
 			// archive downloaded file (new version)
-			ToolIO.pipeStringToFile(loader.getLoad().getContent(), config.getFileHistory(uu,date));
+			ToolIO.pipeStringToFile(loader.getLoad().getContent(), config.getFileHistory(uu,dateModify));
 
 			// update change log of the file
-			ToolMyUtil.writeCsv(this.config.getFileHistoryLog(uu, date), log);
+			ToolMyUtil.writeCsv(this.config.getFileHistoryLog(uu), log);
 			
 			// replace the current file with the new version
 			ToolIO.pipeStringToFile(loader.getLoad().getContent(), file_current);
@@ -234,5 +251,50 @@ public class JobArchive {
 	
 	public Logger getLogger(){
 		return Logger.getLogger(this.getClass());
+	}
+	
+	public void set_change_type(DataSmartMap log, DataLodUri uu, Date date){
+
+		get_change_type(log);
+
+		boolean bOnlineNow= log.getAsString(DataJob.JOB_CHANGE_ONLINE_NOW).equals("true");
+
+		//write RSS - which files were changed on that date;
+		if (bOnlineNow){
+			ToolMyUtil.writeCsv(this.config.getFileIndexRss(date), log);
+		}
+		
+		//write status file
+		if (bOnlineNow){		
+			ToolMyUtil.writeCsv(this.config.getFileHistoryStatusOnline(uu), log);
+		}else{
+			this.config.getFileHistoryStatusOnline(uu).delete();			
+		}
+	}
+		
+	public static String get_change_type(DataSmartMap log){
+		boolean bCached = log.getAsString(DataJob.JOB_CHANGE_CONTENT_CACHED).equals("true");
+		boolean bChanged= log.getAsString(DataJob.JOB_CHANGE_CONTENT_CHANGED).equals("true");
+		boolean bOnlineBefore = log.getAsString(DataJob.JOB_CHANGE_ONLINE_BEFORE).equals("true");
+		boolean bOnlineNow= log.getAsString(DataJob.JOB_CHANGE_ONLINE_NOW).equals("true");
+
+		//set change type
+		String change_type ="";
+		if (bCached && bOnlineNow && bChanged){
+			change_type= DataJob.VALUE_CHANGE_TYPE_UPDATE;
+		}else if (!bCached && bOnlineNow){
+			change_type= DataJob.VALUE_CHANGE_TYPE_NEW;
+		}else if (bOnlineBefore && !bOnlineNow){
+			change_type= DataJob.VALUE_CHANGE_TYPE_OFFLINE;
+		}else if (bCached && !bOnlineBefore && !bOnlineNow ){
+			change_type= DataJob.VALUE_CHANGE_TYPE_SAME;
+		}else if (bCached && bOnlineBefore && bOnlineNow && !bChanged){
+			change_type= DataJob.VALUE_CHANGE_TYPE_SAME;
+		}else if (bCached && !bOnlineBefore && bOnlineNow && !bChanged){
+			change_type= DataJob.VALUE_CHANGE_TYPE_ONLINE;
+		}
+		log.put(DataJob.JOB_CHANGE_TYPE, change_type);
+		
+		return change_type;
 	}
 }
