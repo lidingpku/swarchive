@@ -211,7 +211,7 @@ public class JobArchive {
 
 			// skip unchanged data
 			if (bCached && !bChanged){
-				throw new Sw4jException(Sw4jMessage.STATE_INFO, "duplicate content (by file length)." );
+				throw new Sw4jException(Sw4jMessage.STATE_INFO, "[INFO] no cache. duplicate content (by file length)." );
 			}
 			
 			//continue process if the file has been changed
