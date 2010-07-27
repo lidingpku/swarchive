@@ -29,15 +29,15 @@
 		<jar jarfile="${jar.file}" basedir="${class.dir}" />
 	</target>
 	
-	<target name="archive" depends="compile">
-		<java classname="swarchive.JobArchive">
+	<target name="archive" depends="build">
+		<java classname="swarchive.JobArchive" maxmemory ="4g">
  	        <classpath refid="path.run"/>
 			<arg value="swarchive.conf"/>
 		</java>
 	</target>
 	
-	<target name="discover" depends="compile">
-		<java classname="swarchive.JobDiscover">
+	<target name="discover" depends="build">
+		<java classname="swarchive.JobDiscover" maxmemory ="4g">
  	        <classpath refid="path.run"/>
 			<arg value="swarchive.conf"/>
 		</java>
