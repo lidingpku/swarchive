@@ -32,6 +32,7 @@ public class DataConfig extends Properties{
 
 	public static final String G_PATH_PATTERN_DATE = "yyyy-MM-dd";
 
+	public static final String G_FILENAME_SUFFIX_LOG_PING_ONLINE = "-ping-online.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_JOB = "-archive-job.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_LOG = "-archive-log.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONTO = "-discover-ontology.csv";
@@ -192,6 +193,10 @@ public class DataConfig extends Properties{
 	
 	public  File getFileLogDiscoverOnline(Date date){
 		return getFileLog(date, G_FILENAME_SUFFIX_LOG_DISC_ONLINE);
+	}
+
+	public  File getFileLogPingOnline(Date date){
+		return getFileLog(date, G_FILENAME_SUFFIX_LOG_PING_ONLINE);
 	}
 
 	private File getFileLog(Date date, String filename_suffix){
