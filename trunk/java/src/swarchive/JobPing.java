@@ -5,26 +5,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import sw4j.rdf.load.AgentModelLoader;
-import sw4j.rdf.util.ToolJena;
-import sw4j.task.load.TaskLoad;
 import sw4j.util.DataLRUCache;
-import sw4j.util.DataSmartMap;
 import sw4j.util.Sw4jException;
 import sw4j.util.Sw4jMessage;
-import sw4j.util.ToolHash;
 import sw4j.util.ToolIO;
-import sw4j.util.ToolSafe;
 
 public class JobPing {
 	private DataConfig config = null;
-	private DataSkipPattern skip = null;
 	
 	public static void main(String[] args){
 		
@@ -52,7 +44,6 @@ public class JobPing {
 	
 	public JobPing(DataConfig config){
 		this.config = config;
-		this.skip = DataSkipPattern.create(config);
 	}
 	
 	
@@ -121,8 +112,14 @@ public class JobPing {
 		HttpURLConnection conn = ToolIO.openHttpConnection(uu.url, true);
 		
 		if (conn!=null){
-			System.out.println(uu.url);
+			try {
+				ToolIO.pipeStringToFile(uu.url+"\n", config.getFileLogPingOnline(new Date()), false, true);
+			} catch (Sw4jException e) {
+				e.printStackTrace();
+			}
 			conn.disconnect();
+		}else{
+			System.out.println(String.format("offline URL %s\n", uu.url));
 		}
 			
 	
