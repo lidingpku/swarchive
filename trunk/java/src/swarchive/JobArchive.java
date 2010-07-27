@@ -194,7 +194,10 @@ public class JobArchive {
 
 			String content = loader.getLoad().getContent();
 			log.put(DataJob.JOB_CNT_LENGTH, content.length());
-			log.put(DataJob.JOB_SHA1SUM, ToolHash.hash_mbox_sum_sha1(content));
+			
+			//save hash only for file less then 1M
+			if (content.length()<1024*1024)
+				log.put(DataJob.JOB_SHA1SUM, ToolHash.hash_sum_sha1(content.getBytes()));
 			
 			//check for change
 			if (bCached){
