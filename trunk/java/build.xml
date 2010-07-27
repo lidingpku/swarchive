@@ -29,6 +29,13 @@
 		<jar jarfile="${jar.file}" basedir="${class.dir}" />
 	</target>
 	
+	<target name="ping" depends="build">
+		<java classname="swarchive.JobPing" >
+ 	        <classpath refid="path.run"/>
+			<arg value="swarchive.conf"/>
+		</java>
+	</target>
+	
 	<target name="archive" depends="build">
 		<java classname="swarchive.JobArchive" maxmemory ="4g">
  	        <classpath refid="path.run"/>
