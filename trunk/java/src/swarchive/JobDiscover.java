@@ -97,11 +97,18 @@ public class JobDiscover {
 			if (!job.is_content_changed())
 				continue;
 			
+			
 			//now process the job
 			try {
-				String modifytime =job.getAsString(DataJob.JOB_TS_MODIFIED); 
+				String modifytime =job.getAsString(DataJob.JOB_TS_MODIFIED);
+				Date modifyDate = new Date(Long.parseLong(modifytime));
+				
+				if (job.is_online_now()){
+					ToolIO.pipeStringToFile(job.getAsString(DataJob.JOB_URL)+"\n", config.getFileLogDiscoverOnline(new Date()), false, true);
+				}
+				
 				if (!ToolSafe.isEmpty(modifytime))
-						process_one_url(job.getAsString(DataJob.JOB_URL), new Date(Long.parseLong(modifytime)));
+					process_one_url(job.getAsString(DataJob.JOB_URL), modifyDate);
 				else
 					getLogger().info("bad lines in job description (ts_modified): " + job.toString());
 			} catch (NumberFormatException e) {
