@@ -35,6 +35,7 @@ public class DataConfig extends Properties{
 	public static final String G_FILENAME_SUFFIX_LOG_JOB = "-archive-job.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_LOG = "-archive-log.csv";
 	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONTO = "-discover-ontology.csv";
+	public static final String G_FILENAME_SUFFIX_LOG_DISC_ONLINE = "-discover-online.csv";
 	public static final String G_FILENAME_SUFFIX_INDEX_RSS = "-rss.csv";
 
 	public static final String G_DATA= "data";
@@ -189,6 +190,10 @@ public class DataConfig extends Properties{
 		return getFileLog(date, G_FILENAME_SUFFIX_LOG_DISC_ONTO);
 	}
 	
+	public  File getFileLogDiscoverOnline(Date date){
+		return getFileLog(date, G_FILENAME_SUFFIX_LOG_DISC_ONLINE);
+	}
+
 	private File getFileLog(Date date, String filename_suffix){
 		List<String> paths = createPathsData();
 		paths.add(G_LOG);

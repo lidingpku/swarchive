@@ -30,4 +30,8 @@ public class DataJobDiscover extends DataJob{
 		return temp.equals("true");
 	}
 
+	public boolean is_online_now(){
+		String temp = this.getAsString(JOB_CHANGE_ONLINE_NOW);
+		return temp.equals("true");
+	}
 }
